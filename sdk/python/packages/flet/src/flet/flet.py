@@ -41,7 +41,6 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-
 WEB_BROWSER = "web_browser"
 FLET_APP = "flet_app"
 FLET_APP_HIDDEN = "flet_app_hidden"
@@ -52,16 +51,16 @@ WebRenderer = Literal[None, "auto", "html", "canvaskit"]
 
 
 def app(
-    target,
-    name="",
-    host=None,
-    port=0,
-    view: AppViewer = FLET_APP,
-    assets_dir=None,
-    upload_dir=None,
-    web_renderer="canvaskit",
-    route_url_strategy="path",
-    auth_token=None,
+        target,
+        name="",
+        host=None,
+        port=0,
+        view: AppViewer = FLET_APP,
+        assets_dir=None,
+        upload_dir=None,
+        web_renderer="canvaskit",
+        route_url_strategy="path",
+        auth_token=None,
 ):
     if is_coroutine(target):
         asyncio.get_event_loop().run_until_complete(
@@ -94,16 +93,16 @@ def app(
 
 
 def __app_sync(
-    target,
-    name="",
-    host=None,
-    port=0,
-    view: AppViewer = FLET_APP,
-    assets_dir=None,
-    upload_dir=None,
-    web_renderer="canvaskit",
-    route_url_strategy="path",
-    auth_token=None,
+        target,
+        name="",
+        host=None,
+        port=0,
+        view: AppViewer = FLET_APP,
+        assets_dir=None,
+        upload_dir=None,
+        web_renderer="canvaskit",
+        route_url_strategy="path",
+        auth_token=None,
 ):
     force_web_view = os.environ.get("FLET_FORCE_WEB_VIEW")
     assets_dir = __get_assets_dir_path(assets_dir)
@@ -142,9 +141,9 @@ def __app_sync(
     pid_file = None
 
     if (
-        (view == FLET_APP or view == FLET_APP_HIDDEN)
-        and not is_linux_server()
-        and url_prefix is None
+            (view == FLET_APP or view == FLET_APP_HIDDEN)
+            and not is_linux_server()
+            and url_prefix is None
     ):
         fvp, pid_file = open_flet_view(
             conn.page_url, assets_dir, view == FLET_APP_HIDDEN
@@ -168,16 +167,16 @@ def __app_sync(
 
 
 async def app_async(
-    target,
-    name="",
-    host=None,
-    port=0,
-    view: AppViewer = FLET_APP,
-    assets_dir=None,
-    upload_dir=None,
-    web_renderer="canvaskit",
-    route_url_strategy="path",
-    auth_token=None,
+        target,
+        name="",
+        host=None,
+        port=0,
+        view: AppViewer = FLET_APP,
+        assets_dir=None,
+        upload_dir=None,
+        web_renderer="canvaskit",
+        route_url_strategy="path",
+        auth_token=None,
 ):
     force_web_view = os.environ.get("FLET_FORCE_WEB_VIEW")
     assets_dir = __get_assets_dir_path(assets_dir)
@@ -216,9 +215,9 @@ async def app_async(
     pid_file = None
 
     if (
-        (view == FLET_APP or view == FLET_APP_HIDDEN)
-        and not is_linux_server()
-        and url_prefix is None
+            (view == FLET_APP or view == FLET_APP_HIDDEN)
+            and not is_linux_server()
+            and url_prefix is None
     ):
         fvp, pid_file = await open_flet_view_async(
             conn.page_url, assets_dir, view == FLET_APP_HIDDEN
@@ -253,27 +252,25 @@ def close_flet_view(pid_file):
 
 
 def __connect_internal_sync(
-    page_name,
-    view: AppViewer = None,
-    host=None,
-    port=0,
-    server=None,
-    auth_token=None,
-    session_handler=None,
-    assets_dir=None,
-    upload_dir=None,
-    web_renderer=None,
-    route_url_strategy=None,
+        page_name,
+        view: AppViewer = None,
+        host=None,
+        port=0,
+        server=None,
+        auth_token=None,
+        session_handler=None,
+        assets_dir=None,
+        upload_dir=None,
+        web_renderer=None,
+        route_url_strategy=None,
 ):
-
     env_port = os.getenv("FLET_SERVER_PORT")
     if env_port is not None and env_port:
         port = int(env_port)
 
     uds_path = os.getenv("FLET_SERVER_UDS_PATH")
 
-    is_desktop = view == FLET_APP or view == FLET_APP_HIDDEN
-    if server is None and not is_desktop:
+    if server is None:
         server = __start_flet_server(
             host,
             port,
@@ -307,40 +304,30 @@ def __connect_internal_sync(
             )
             page.error(f"There was an error while processing your request: {e}")
 
-    if is_desktop:
-        conn = SyncLocalSocketConnection(
-            port,
-            uds_path,
-            on_event=on_event,
-            on_session_created=on_session_created,
-        )
-    else:
-        assert server
-        conn = SyncWebSocketConnection(
-            server_address=server,
-            page_name=page_name,
-            token=auth_token,
-            on_event=on_event,
-            on_session_created=on_session_created,
-        )
+    conn = SyncWebSocketConnection(
+        server_address=server,
+        page_name=page_name,
+        token=auth_token,
+        on_event=on_event,
+        on_session_created=on_session_created,
+    )
     conn.connect()
     return conn
 
 
 async def __connect_internal_async(
-    page_name,
-    view: AppViewer = None,
-    host=None,
-    port=0,
-    server=None,
-    auth_token=None,
-    session_handler=None,
-    assets_dir=None,
-    upload_dir=None,
-    web_renderer=None,
-    route_url_strategy=None,
+        page_name,
+        view: AppViewer = None,
+        host=None,
+        port=0,
+        server=None,
+        auth_token=None,
+        session_handler=None,
+        assets_dir=None,
+        upload_dir=None,
+        web_renderer=None,
+        route_url_strategy=None,
 ):
-
     env_port = os.getenv("FLET_SERVER_PORT")
     if env_port is not None and env_port:
         port = int(env_port)
@@ -405,7 +392,7 @@ async def __connect_internal_async(
 
 
 def __start_flet_server(
-    host, port, assets_dir, upload_dir, web_renderer, route_url_strategy
+        host, port, assets_dir, upload_dir, web_renderer, route_url_strategy
 ):
     server_ip = host if host not in [None, "", "*"] else "127.0.0.1"
 
@@ -670,7 +657,6 @@ def __download_flet_client(file_name):
     flet_url = f"https://github.com/flet-dev/flet/releases/download/v{ver}/{file_name}"
     urllib.request.urlretrieve(flet_url, temp_arch)
     return str(temp_arch)
-
 
 # Fix: https://bugs.python.org/issue35935
 # if _is_windows():
