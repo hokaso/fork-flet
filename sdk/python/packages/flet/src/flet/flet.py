@@ -334,7 +334,8 @@ async def __connect_internal_async(
 
     uds_path = os.getenv("FLET_SERVER_UDS_PATH")
 
-    if server is None:
+    is_desktop = view == FLET_APP or view == FLET_APP_HIDDEN
+    if server is None and not is_desktop:
         server = __start_flet_server(
             host,
             port,
@@ -370,13 +371,22 @@ async def __connect_internal_async(
                 f"There was an error while processing your request: {e}"
             )
 
-    conn = AsyncWebSocketConnection(
-        server_address=server,
-        page_name=page_name,
-        auth_token=auth_token,
-        on_event=on_event,
-        on_session_created=on_session_created,
-    )
+    if is_desktop:
+        conn = AsyncLocalSocketConnection(
+            port,
+            uds_path,
+            on_event=on_event,
+            on_session_created=on_session_created,
+        )
+    else:
+        assert server
+        conn = AsyncWebSocketConnection(
+            server_address=server,
+            page_name=page_name,
+            auth_token=auth_token,
+            on_event=on_event,
+            on_session_created=on_session_created,
+        )
     await conn.connect()
     return conn
 
@@ -434,7 +444,8 @@ def __start_flet_server(
     web_root_dir = get_package_web_dir()
 
     if not os.path.exists(web_root_dir):
-        raise Exception("Web root path not found: {}".format(web_root_dir))
+        os.makedirs(web_root_dir)
+        # raise Exception("Web root path not found: {}".format(web_root_dir))
 
     args = [fletd_path, "--content-dir", web_root_dir, "--port", str(port)]
 
