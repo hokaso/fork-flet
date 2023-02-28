@@ -15,7 +15,7 @@ from typing import Optional
 from flet import version
 from flet.async_local_socket_connection import AsyncLocalSocketConnection
 from flet.async_websocket_connection import AsyncWebSocketConnection
-from flet.sync_local_socket_connection import SyncLocalSocketConnection
+# from flet.sync_local_socket_connection import SyncLocalSocketConnection
 from flet.sync_websocket_connection import SyncWebSocketConnection
 from flet.utils import (
     get_arch,
