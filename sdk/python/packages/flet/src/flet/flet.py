@@ -55,16 +55,16 @@ WebRenderer = Literal[None, "auto", "html", "canvaskit"]
 
 
 def app(
-        target,
-        name="",
-        host=None,
-        port=0,
-        view: AppViewer = FLET_APP,
-        assets_dir=None,
-        upload_dir=None,
-        web_renderer="canvaskit",
-        route_url_strategy="path",
-        auth_token=None,
+    target,
+    name="",
+    host=None,
+    port=0,
+    view: AppViewer = FLET_APP,
+    assets_dir=None,
+    upload_dir=None,
+    web_renderer="canvaskit",
+    route_url_strategy="path",
+    auth_token=None,
 ):
     if is_coroutine(target):
         asyncio.get_event_loop().run_until_complete(
@@ -97,16 +97,16 @@ def app(
 
 
 def __app_sync(
-        target,
-        name="",
-        host=None,
-        port=0,
-        view: AppViewer = FLET_APP,
-        assets_dir=None,
-        upload_dir=None,
-        web_renderer="canvaskit",
-        route_url_strategy="path",
-        auth_token=None,
+    target,
+    name="",
+    host=None,
+    port=0,
+    view: AppViewer = FLET_APP,
+    assets_dir=None,
+    upload_dir=None,
+    web_renderer="canvaskit",
+    route_url_strategy="path",
+    auth_token=None,
 ):
     force_web_view = os.environ.get("FLET_FORCE_WEB_VIEW")
     assets_dir = __get_assets_dir_path(assets_dir)
@@ -145,9 +145,9 @@ def __app_sync(
     pid_file = None
 
     if (
-            (view == FLET_APP or view == FLET_APP_HIDDEN)
-            and not is_linux_server()
-            and url_prefix is None
+        (view == FLET_APP or view == FLET_APP_HIDDEN)
+        and not is_linux_server()
+        and url_prefix is None
     ):
         fvp, pid_file = open_flet_view(
             conn.page_url, assets_dir, view == FLET_APP_HIDDEN
@@ -171,16 +171,16 @@ def __app_sync(
 
 
 async def app_async(
-        target,
-        name="",
-        host=None,
-        port=0,
-        view: AppViewer = FLET_APP,
-        assets_dir=None,
-        upload_dir=None,
-        web_renderer="canvaskit",
-        route_url_strategy="path",
-        auth_token=None,
+    target,
+    name="",
+    host=None,
+    port=0,
+    view: AppViewer = FLET_APP,
+    assets_dir=None,
+    upload_dir=None,
+    web_renderer="canvaskit",
+    route_url_strategy="path",
+    auth_token=None,
 ):
     force_web_view = os.environ.get("FLET_FORCE_WEB_VIEW")
     assets_dir = __get_assets_dir_path(assets_dir)
@@ -219,9 +219,9 @@ async def app_async(
     pid_file = None
 
     if (
-            (view == FLET_APP or view == FLET_APP_HIDDEN)
-            and not is_linux_server()
-            and url_prefix is None
+        (view == FLET_APP or view == FLET_APP_HIDDEN)
+        and not is_linux_server()
+        and url_prefix is None
     ):
         fvp, pid_file = await open_flet_view_async(
             conn.page_url, assets_dir, view == FLET_APP_HIDDEN
@@ -249,24 +249,24 @@ def close_flet_view(pid_file):
                 fvp_pid = int(f.read())
             logger.debug(f"Flet View process {fvp_pid}")
             os.kill(fvp_pid, signal.SIGKILL)
-        except:
+        except Exception:
             pass
         finally:
             os.remove(pid_file)
 
 
 def __connect_internal_sync(
-        page_name,
-        view: AppViewer = None,
-        host=None,
-        port=0,
-        server=None,
-        auth_token=None,
-        session_handler=None,
-        assets_dir=None,
-        upload_dir=None,
-        web_renderer=None,
-        route_url_strategy=None,
+    page_name,
+    view: AppViewer = None,
+    host=None,
+    port=0,
+    server=None,
+    auth_token=None,
+    session_handler=None,
+    assets_dir=None,
+    upload_dir=None,
+    web_renderer=None,
+    route_url_strategy=None,
 ):
 
     env_port = os.getenv("FLET_SERVER_PORT")
@@ -323,17 +323,17 @@ def __connect_internal_sync(
 
 
 async def __connect_internal_async(
-        page_name,
-        view: AppViewer = None,
-        host=None,
-        port=0,
-        server=None,
-        auth_token=None,
-        session_handler=None,
-        assets_dir=None,
-        upload_dir=None,
-        web_renderer=None,
-        route_url_strategy=None,
+    page_name,
+    view: AppViewer = None,
+    host=None,
+    port=0,
+    server=None,
+    auth_token=None,
+    session_handler=None,
+    assets_dir=None,
+    upload_dir=None,
+    web_renderer=None,
+    route_url_strategy=None,
 ):
 
     env_port = os.getenv("FLET_SERVER_PORT")
@@ -402,7 +402,7 @@ async def __connect_internal_async(
 
 
 def __start_flet_server(
-        host, port, assets_dir, upload_dir, web_renderer, route_url_strategy
+    host, port, assets_dir, upload_dir, web_renderer, route_url_strategy
 ):
     server_ip = host if host not in [None, "", "*"] else "127.0.0.1"
 
@@ -424,7 +424,7 @@ def __start_flet_server(
             # download flet from GitHub (python module developer mode)
             fletd_path = __download_fletd()
         else:
-            logger.info(f"Flet Server found in PATH")
+            logger.info("Flet Server found in PATH")
 
     fletd_env = {**os.environ}
 
@@ -455,7 +455,7 @@ def __start_flet_server(
 
     if not os.path.exists(web_root_dir):
         os.makedirs(web_root_dir)
-        # raise Exception("Web root path not found: {}".format(web_root_dir))
+        # raise Exception(f"Web root path not found: {web_root_dir}")
 
     args = [fletd_path, "--content-dir", web_root_dir, "--port", str(port)]
 
@@ -531,7 +531,7 @@ def __get_assets_dir_path(assets_dir: Optional[str]):
 
 
 def __locate_and_unpack_flet_view(page_url, assets_dir, hidden):
-    logger.info(f"Starting Flet View app...")
+    logger.info("Starting Flet View app...")
 
     args = []
 

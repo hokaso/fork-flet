@@ -111,6 +111,7 @@ class Page(Control):
         self.__offstage = Offstage()
         self.__theme = None
         self.__dark_theme = None
+        self.__theme_mode = ThemeMode.SYSTEM  # Default Theme Mode
         self.__pubsub = PubSub(conn.pubsubhub, session_id)
         self.__client_storage = ClientStorage(self)
         self.__session_storage = SessionStorage(self)
@@ -136,6 +137,7 @@ class Page(Control):
             if self.__last_route == e.data:
                 return None  # avoid duplicate calls
             self.__last_route = e.data
+            self._set_attr("route", e.data, False)
             self.query()  # Update query url (required when manually changed from browser)
             return RouteChangeEvent(route=e.data)
 
@@ -228,6 +230,8 @@ class Page(Control):
             Command(0, "get", ["page", "windowHeight"]),
             Command(0, "get", ["page", "windowTop"]),
             Command(0, "get", ["page", "windowLeft"]),
+            Command(0, "get", ["page", "clientIP"]),
+            Command(0, "get", ["page", "clientUserAgent"]),
         ]
 
     def __set_page_details(self, values):
@@ -241,6 +245,8 @@ class Page(Control):
         self._set_attr("windowHeight", values[7], False)
         self._set_attr("windowTop", values[8], False)
         self._set_attr("windowLeft", values[9], False)
+        self._set_attr("clientIP", values[10], False)
+        self._set_attr("clientUserAgent", values[11], False)
 
     def update(self, *controls):
         with self.__lock:
@@ -407,7 +413,7 @@ class Page(Control):
         for ctrl in added_controls:
             if ctrl.page and ctrl.page != self:
                 raise Exception(
-                    "Control has already been added to another page: {}".format(ctrl)
+                    f"Control has already been added to another page: {ctrl}"
                 )
 
     def __update_control_ids(self, added_controls, results):
@@ -481,7 +487,7 @@ class Page(Control):
                         self._index[id]._set_attr(name, props[name], dirty=False)
 
     def go(self, route, **kwargs):
-        self.route = route if kwargs == {} else route + self.query.post(kwargs)
+        self.route = route if not kwargs else route + self.query.post(kwargs)
 
         self.__on_route_change.get_sync_handler()(
             ControlEvent(
@@ -496,7 +502,7 @@ class Page(Control):
         self.query()  # Update query url (required when using go)
 
     async def go_async(self, route, **kwargs):
-        self.route = route if kwargs == {} else route + self.query.post(kwargs)
+        self.route = route if not kwargs else route + self.query.post(kwargs)
 
         await self.__on_route_change.get_handler()(
             ControlEvent(
@@ -771,13 +777,13 @@ class Page(Control):
         window_height: Optional[int] = None,
     ):
         args = {"url": url}
-        if web_window_name != None:
+        if web_window_name is not None:
             args["web_window_name"] = web_window_name
-        if web_popup_window != None:
+        if web_popup_window is not None:
             args["web_popup_window"] = str(web_popup_window)
-        if window_width != None:
+        if window_width is not None:
             args["window_width"] = str(window_width)
-        if window_height != None:
+        if window_height is not None:
             args["window_height"] = str(window_height)
         return args
 
@@ -840,9 +846,9 @@ class Page(Control):
             )
 
         result, err = self.__method_call_results.pop(evt)
-        if err != None:
+        if err is not None:
             raise Exception(err)
-        if result == None:
+        if result is None:
             return None
         return result
 
@@ -884,9 +890,9 @@ class Page(Control):
             )
 
         result, err = self.__method_call_results.pop(evt)
-        if err != None:
+        if err is not None:
             raise Exception(err)
-        if result == None:
+        if result is None:
             return None
         return result
 
@@ -894,7 +900,7 @@ class Page(Control):
         d = json.loads(e.data)
         result = InvokeMethodResults(**d)
         evt = self.__method_calls.pop(result.method_id, None)
-        if evt == None:
+        if evt is None:
             return
         self.__method_call_results[evt] = (result.result, result.error)
         evt.set()
@@ -1008,6 +1014,16 @@ class Page(Control):
     @property
     def platform(self):
         return self._get_attr("platform")
+
+    # client_ip
+    @property
+    def client_ip(self):
+        return self._get_attr("clientIP")
+
+    # client_user_agent
+    @property
+    def client_user_agent(self):
+        return self._get_attr("clientUserAgent")
 
     # design
     @property
